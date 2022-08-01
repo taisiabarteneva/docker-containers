@@ -1,21 +1,16 @@
 FROM debian:buster
 
 RUN apt update && apt -y install nginx openssl; \
-    rm -rf /var/lib/apt/lists/*
-
+    echo "daemon off;" >> /etc/nginx/nginx.conf; \
+    rm -rf /var/lib/apt/lists/* 
 
 COPY ./conf/nginx.conf      /etc/nginx/sites-available/default
-COPY ./tools/key-gen.sh     /usr/bin
 
 EXPOSE 443
 
-VOLUME [ "/var/www/" ]
+RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 3650 -nodes \
+    -out    /etc/ssl/wurrigon.42.fr.cert \
+    -keyout /etc/ssl/wurrigon.42.fr.key \
+    -subj "/C=RU/ST=Moscow/L=Moscow /O=21 School/OU=wurrigon/CN=wurrigon.42.fr/emailAddress=unknown"
 
-RUN chmod +x /usr/bin/key-gen.sh
-
-ENTRYPOINT [ "/usr/bin/key-gen.sh" ]
-
-# RUN chmod 777 /etc/ssl/*
-# RUN chown -R www-data /var/www/
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD [ "nginx" ]

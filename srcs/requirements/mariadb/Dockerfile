@@ -3,8 +3,6 @@ FROM debian:buster
 RUN apt update && apt install -y mariadb-server; \
     rm -rf /var/lib/apt/lists/*
 
-VOLUME [ "/var/lib/mysql" ]
-
 EXPOSE 3306
 
 COPY ./tools/mariadb-setup.sh   /usr/bin/
